@@ -2,7 +2,7 @@ const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
 const getDate = require('./date')
-const PORT = process.env.PORT || 3000
+const PORT = process.env.PORT || 3001
 let items = ['Wash dishes', 'Buy milk']
 
 //using the ejs templating engine
