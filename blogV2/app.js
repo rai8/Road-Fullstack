@@ -30,12 +30,21 @@ mongoose.connect(
   () => console.log('----successfully connected to database------')
 )
 
-let posts = []
+//creating a new postSchema that contains title and content
+const postSchema = {
+  title: String,
+  content: String,
+}
+
+//creating model that will use the postSchema
+const Post = mongoose.model('Post', postSchema)
 
 app.get('/', function (req, res) {
-  res.render('home', {
-    startingContent: homeStartingContent,
-    posts: posts,
+  Post.find({}, (err, posts) => {
+    res.render('home', {
+      startingContent: homeStartingContent,
+      posts: posts,
+    })
   })
 })
 
@@ -52,28 +61,25 @@ app.get('/compose', function (req, res) {
 })
 
 app.post('/compose', function (req, res) {
-  const post = {
+  const post = new Post({
     title: req.body.postTitle,
     content: req.body.postBody,
-  }
-
-  posts.push(post)
-
-  res.redirect('/')
+  })
+  post.save(err => {
+    if (!err) {
+      res.redirect('/')
+    }
+  })
 })
 
-app.get('/posts/:postName', function (req, res) {
-  const requestedTitle = _.lowerCase(req.params.postName)
-
-  posts.forEach(function (post) {
-    const storedTitle = _.lowerCase(post.title)
-
-    if (storedTitle === requestedTitle) {
-      res.render('post', {
-        title: post.title,
-        content: post.content,
-      })
-    }
+app.get('/posts/:postId', function (req, res) {
+  const requestedPostId = req.params.postId
+  //find a single item using id
+  Post.findOne({ _id: requestedPostId }, (err, post) => {
+    res.render('post', {
+      title: post.title,
+      content: post.content,
+    })
   })
 })
 
